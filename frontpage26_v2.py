@@ -218,38 +218,67 @@ def scene_kuwait(d, box):
     d.ellipse([ex - 5, ey - 5, ex + 5, ey + 5], fill=(255, 240, 180))
 
 def scene_eu(d, box):
-    """Oval summit table, EU star circle, flags, NO DEAL placard. Hero 3."""
+    """Summit room in slight perspective: wall flag + late-hour clock,
+    delegates behind a thick oval table, name plates, star centrepiece,
+    NO DEAL banner across the table front. Hero 3."""
     x0, y0, x1, y1 = box
-    vgrad(d, (x0, y0, x1, y1), (30, 42, 74), (58, 74, 110))
-    # wall panels + flags
-    for i, col in enumerate([(0, 51, 102), (185, 28, 28), (0, 51, 102),
-                             (22, 101, 52), (0, 51, 102)]):
-        fx = x0 + 18 + i * 56
-        d.rectangle([fx, y0 + 10, fx + 34, y0 + 30], fill=col, outline=(220, 220, 210))
-        d.text((fx + 17, y0 + 20), "EU", font=SANS_B(8), fill=(255, 255, 255), anchor="mm")
-    # seated figures behind the table (heads above the table edge)
-    cx, cy = (x0 + x1) // 2, y0 + 66
-    for fx in [cx - 96, cx - 32, cx + 32, cx + 96]:
-        d.ellipse([fx - 6, cy - 36, fx + 6, cy - 24], fill=(235, 220, 195))
-        d.rectangle([fx - 10, cy - 24, fx + 10, cy - 12], fill=(30, 30, 38))
-    # oval table
-    d.ellipse([cx - 128, cy - 26, cx + 128, cy + 26], fill=(120, 74, 40),
-              outline=(70, 42, 20), width=2)
-    d.ellipse([cx - 118, cy - 21, cx + 118, cy + 21], fill=(146, 92, 50))
-    # EU star circle on table
+    vgrad(d, (x0, y0, x1, y1), (28, 40, 72), (52, 68, 104))
+    cx = (x0 + x1) // 2
+    # picture rail on the wall
+    d.line([(x0, y0 + 36), (x1, y0 + 36)], fill=(120, 100, 60), width=1)
+    # big EU flag on the wall, left
+    fx0, fy0, fx1, fy1 = x0 + 14, y0 + 7, x0 + 66, y0 + 33
+    d.rectangle([fx0, fy0, fx1, fy1], fill=(0, 51, 153), outline=(220, 220, 210))
     for i in range(12):
         ang = 2 * math.pi * i / 12 - math.pi / 2
-        sx, sy = cx + 26 * math.cos(ang), cy + 26 * math.sin(ang) * 0.62
-        d.ellipse([sx - 2.5, sy - 2.5, sx + 2.5, sy + 2.5], fill=(255, 215, 0))
-    d.text((cx, cy), "€45bn", font=SERIF_B(15), fill=(255, 255, 255), anchor="mm")
-    # NO DEAL placard
-    d.rectangle([cx - 46, y1 - 24, cx + 46, y1 - 8], fill=(185, 28, 28))
-    d.text((cx, y1 - 16), "NO DEAL", font=SANS_B(11), fill=(255, 255, 255), anchor="mm")
-    # clock on wall
-    d.ellipse([x1 - 34, y0 + 8, x1 - 12, y0 + 30], fill=(240, 238, 225),
-              outline=(40, 40, 40))
-    d.line([(x1 - 23, y0 + 19), (x1 - 23, y0 + 11)], fill=(40, 40, 40), width=1)
-    d.line([(x1 - 23, y0 + 19), (x1 - 16, y0 + 19)], fill=(40, 40, 40), width=1)
+        sx = (fx0 + fx1) / 2 + 11 * math.cos(ang)
+        sy = (fy0 + fy1) / 2 + 8 * math.sin(ang)
+        d.ellipse([sx - 1.6, sy - 1.6, sx + 1.6, sy + 1.6], fill=(255, 215, 0))
+    # wall clock, right — inset from the panel edge, hands near midnight
+    ccx, ccy, cr = x1 - 26, y0 + 20, 12
+    d.ellipse([ccx - cr, ccy - cr, ccx + cr, ccy + cr],
+              fill=(240, 238, 225), outline=(40, 40, 40), width=2)
+    for hh in range(12):
+        ang = math.pi * hh / 6
+        tx = ccx + (cr - 2) * math.sin(ang)
+        ty = ccy - (cr - 2) * math.cos(ang)
+        d.ellipse([tx - 1, ty - 1, tx + 1, ty + 1], fill=(40, 40, 40))
+    d.line([(ccx, ccy), (ccx, ccy - cr + 4)], fill=(40, 40, 40), width=2)
+    d.line([(ccx, ccy), (ccx - 5, ccy - 3)], fill=(40, 40, 40), width=2)
+    d.ellipse([ccx - 2, ccy - 2, ccx + 2, ccy + 2], fill=(40, 40, 40))
+    # far-side delegates: heads + shoulders above the table
+    for fx in [cx - 104, cx - 52, cx, cx + 52, cx + 104]:
+        d.ellipse([fx - 5, y0 + 40, fx + 5, y0 + 50], fill=(235, 220, 195))
+        d.rounded_rectangle([fx - 11, y0 + 50, fx + 11, y0 + 58], radius=3,
+                            fill=(28, 28, 36))
+    # table: dark side band (thickness) first, then the top surface
+    d.ellipse([cx - 130, y0 + 62, cx + 130, y0 + 86], fill=(74, 46, 22))
+    d.ellipse([cx - 130, y0 + 56, cx + 130, y0 + 80], fill=(120, 74, 40),
+              outline=(70, 42, 20), width=2)
+    d.ellipse([cx - 122, y0 + 59, cx + 122, y0 + 77], outline=(160, 104, 58),
+              width=1)
+    # name plates on the table in front of each delegate
+    for fx in [cx - 104, cx - 52, cx, cx + 52, cx + 104]:
+        d.rectangle([fx - 9, y0 + 60, fx + 9, y0 + 66], fill=(245, 242, 230),
+                    outline=(120, 110, 90))
+        d.line([(fx - 6, y0 + 63), (fx + 6, y0 + 63)], fill=(120, 110, 90),
+               width=1)
+    # star centrepiece + €45bn on the table surface
+    for i in range(12):
+        ang = 2 * math.pi * i / 12 - math.pi / 2
+        sx = cx - 34 + 10 * math.cos(ang)
+        sy = y0 + 68 + 6 * math.sin(ang)
+        d.ellipse([sx - 1.8, sy - 1.8, sx + 1.8, sy + 1.8], fill=(255, 215, 0))
+    d.text((cx + 6, y0 + 68), "€45bn", font=SERIF_B(14), fill=(255, 255, 255),
+           anchor="lm")
+    # near-side chair backs in the foreground corners
+    for fx in [x0 + 26, x1 - 26]:
+        d.rounded_rectangle([fx - 12, y0 + 88, fx + 12, y1 - 2], radius=3,
+                            fill=(24, 24, 32))
+    # NO DEAL banner across the table front
+    d.rectangle([cx - 46, y0 + 84, cx + 46, y0 + 96], fill=(185, 28, 28))
+    d.text((cx, y0 + 90), "NO DEAL", font=SANS_B(11), fill=(255, 255, 255),
+           anchor="mm")
 
 def scene_kyiv(d, box):
     """Night skyline, missile trails, fire glow. Scene 4."""
@@ -482,14 +511,34 @@ def scene_canary(d, box):
             d.arc([xx, yy - 3, xx + 16, yy + 3], 180, 360, fill=(220, 235, 245), width=1)
 
 # ---------------------------------------------------------------- map
-LAND = [
-    (-100, 48, 32, 16), (-96, 30, 20, 11), (-84, 18, 9, 5),
-    (-60, -10, 12, 20), (-64, -28, 8, 12),
-    (12, 52, 13, 7), (24, 60, 11, 6), (0, 52, 8, 5),
-    (16, 4, 17, 15), (22, -18, 9, 11),
-    (70, 55, 32, 11), (100, 36, 18, 11), (90, 14, 11, 7),
-    (78, 21, 8, 8), (45, 25, 9, 7), (138, 38, 4, 6),
-    (134, -25, 11, 6),
+# Hand-built land bitmap: 24 rows, lat 84..-54 in 6 deg steps; each row is
+# a list of (first_col, last_col) land spans, cols = 5 deg lon steps
+# (col 0 = -180..-175, col 36 = 0..5, col 71 = 175..180).
+LAND_BITMAP = [
+    [(4, 7), (11, 19), (25, 30)],                                  # 84
+    [(2, 8), (10, 22), (25, 32), (38, 41), (44, 50), (55, 60), (64, 71)],  # 78
+    [(2, 8), (10, 22), (25, 31), (44, 71)],                        # 72
+    [(2, 8), (9, 25), (37, 41), (42, 71)],                         # 66
+    [(3, 8), (9, 25), (35, 36), (37, 42), (42, 71)],               # 60
+    [(9, 25), (34, 42), (42, 71)],                                 # 54
+    [(11, 25), (34, 42), (42, 64)],                                # 48
+    [(11, 22), (34, 42), (42, 47), (47, 63), (62, 64)],            # 42
+    [(11, 21), (34, 43), (43, 48), (48, 61)],                      # 36
+    [(13, 19), (34, 43), (43, 47), (49, 53), (56, 60)],            # 30
+    [(14, 19), (33, 43), (44, 47), (50, 53), (55, 57), (60, 60)],  # 24
+    [(15, 19), (33, 43), (51, 52), (55, 57), (60, 60)],            # 18
+    [(17, 20), (33, 38), (43, 46), (51, 51), (55, 57), (60, 60)],  # 12
+    [(21, 22), (34, 38), (38, 42), (55, 60)],                      # 6
+    [(20, 29), (38, 44), (55, 64), (64, 66)],                      # 0
+    [(20, 29), (38, 44), (57, 64), (64, 66)],                      # -6
+    [(21, 28), (38, 43), (44, 46), (62, 66)],                      # -12
+    [(22, 28), (39, 43), (45, 46), (60, 66)],                      # -18
+    [(22, 28), (39, 42), (59, 66)],                                # -24
+    [(22, 26), (39, 42), (59, 66), (69, 71)],                      # -30
+    [(22, 24), (64, 66), (69, 70)],                                # -36
+    [(21, 23)],                                                     # -42
+    [(21, 23)],                                                     # -48
+    [(22, 23)],                                                     # -54
 ]
 REGION_COL = {
     "NA": (31, 78, 121), "EU": (46, 107, 52), "ME": (139, 69, 19),
@@ -506,23 +555,25 @@ PINS = [  # (lon, lat, num, region, dx, dy) — dx/dy = display offset for legib
     (-18, 28.3, 13, "EU", 0, 0),
 ]
 
-def is_land(lon, lat):
-    for (cx, cy, rx, ry) in LAND:
-        if ((lon - cx) / rx) ** 2 + ((lat - cy) / ry) ** 2 <= 1:
-            return True
-    return False
-
 def draw_map(d, box):
     x0, y0, x1, y1 = box
     d.rectangle(box, fill=(238, 234, 220), outline=INK, width=1)
     mw, mh = x1 - x0, y1 - y0
-    # sparse dot grid: 3 deg lon (8.4px) x 9 deg lat (~6.2px at this height)
-    for lon in range(-177, 181, 3):
-        for lat in range(-54, 84, 9):
-            if is_land(lon, lat):
-                px = x0 + (lon + 180) / 360 * mw
-                py = y0 + (83 - lat) / 138 * mh
-                d.ellipse([px - 2, py - 2, px + 2, py + 2], fill=(96, 112, 138))
+    # dense uniform dot grid (7px); each dot's lon/lat is tested against
+    # the hand-built land bitmap (nearest cell) so the continents read.
+    step, dot_r = 7, 2.2
+    for gy in range(int(mh // step)):
+        py = y0 + step / 2 + gy * step
+        lat = 83 - (py - y0) / mh * 138
+        row = max(0, min(23, int(round((84 - lat) / 6))))
+        spans = LAND_BITMAP[row]
+        for gx in range(int(mw // step)):
+            px = x0 + step / 2 + gx * step
+            lon = -180 + (px - x0) / mw * 360
+            col = max(0, min(71, int(round((lon + 180) / 5))))
+            if any(a <= col <= b for (a, b) in spans):
+                d.ellipse([px - dot_r, py - dot_r, px + dot_r, py + dot_r],
+                          fill=(70, 88, 118))
     for (lon, lat, n, reg, dx, dy) in PINS:
         px = x0 + (lon + 180) / 360 * mw
         py = y0 + (83 - lat) / 138 * mh
@@ -751,8 +802,8 @@ def build():
     d.text((8, y), "WHERE IT HAPPENED — pins = picture numbers, coloured by region",
            font=SANS_B(10), fill=NAVY, anchor="la")
     y += 14
-    draw_map(d, (8, y, W - 8, y + 96))
-    y += 96 + 4
+    draw_map(d, (8, y, W - 8, y + 88))
+    y += 88 + 4
     # --- ALSO list
     d.text((8, y), "ALSO ON 26 NOVEMBER — 24 MORE STORIES",
            font=SANS_B(12), fill=NAVY, anchor="la")
@@ -772,14 +823,14 @@ def build():
             d.text((tx, ry + j * 11), ln, font=SANS(10), fill=INK, anchor="la")
     y += 8 * 22 + 2
     # --- date check
-    d.rectangle([8, y, W - 8, y + 50], outline=RED, width=2)
-    d.text((14, y + 3), "DATE CHECK — NOT 26 NOVEMBER NEWS (EXCLUDED):",
+    d.rectangle([8, y, W - 8, y + 58], outline=RED, width=2)
+    d.text((14, y + 5), "DATE CHECK — NOT 26 NOVEMBER NEWS (EXCLUDED):",
            font=SANS_B(10), fill=RED, anchor="la")
     for i, item in enumerate(DATECHECK):
         col, row = divmod(i, 5)
         x = 14 + col * ((W - 28) / 2)
-        d.text((x, y + 14 + row * 7), "• " + item, font=SANS(8), fill=INK, anchor="la")
-    y += 50 + 3
+        d.text((x, y + 19 + row * 7), "• " + item, font=SANS(8), fill=INK, anchor="la")
+    y += 58 + 3
     # --- footer
     d.text((8, y), "HOW SURE:  OFFICIAL = authority's own word  ·  CONFIRMED = 2+ outlets  ·  REPORTED = 1 outlet  ·  CLAIM = one side's account, not verified  (ALSO list: OF/CF/RP/CL = same scale)",
            font=SANS(8), fill=GREY, anchor="la")
