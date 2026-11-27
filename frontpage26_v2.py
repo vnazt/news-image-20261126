@@ -4,6 +4,9 @@
 # v3 edits (2026-11-27): 48 stories / 12 regions / 16 fields, 6 real UTC
 # times, 14th pictured scene (Flinders), balloon face, Ebola tent fix,
 # 20-outlet footer, DATE CHECK 14 traps — per v3-spec.md. v2 layout kept.
+# v4 edits (2026-11-27): 50 stories, Mumbai hero scene 15 (12 scenes),
+# Ebola tent + Flinders fire redrawn, per-line ALSO sources, EU heads
+# ~1.5x, bigger map pins, DATE CHECK 16 traps — per v4-spec.md.
 # Draws a dense illustrated broadsheet front page, 1024x1024, Pillow only.
 import math, random
 from PIL import Image, ImageDraw, ImageFont
@@ -182,6 +185,18 @@ def scene_macys(d, box):
     d.ellipse([x1 - 42, y1 - 30, x1 - 14, y1 - 2], fill=GOLD,
               outline=(120, 90, 20), width=2)
     d.text((x1 - 28, y1 - 16), "100", font=SANS_B(12), fill=NAVY, anchor="mm")
+    # distant small balloons + street crowd (v4 density)
+    for (dx, dy, r) in [(x0 + 24, y0 + 34, 9), (x1 - 26, y0 + 44, 8)]:
+        d.ellipse([dx - r, dy - r * 0.6, dx + r, dy + r * 0.6],
+                  fill=(150, 40, 40), outline=(110, 20, 20), width=1)
+        d.line([(dx, dy + r * 0.6), (dx, dy + r * 0.6 + 10)],
+               fill=(230, 230, 230), width=1)
+    rnd = random.Random(17)
+    for _ in range(26):
+        cx = rnd.uniform(x0 + 6, x1 - 6)
+        col = rnd.choice([(220, 60, 50), (60, 110, 200), (240, 200, 60),
+                          (230, 230, 230), (80, 160, 90)])
+        d.ellipse([cx - 2, y1 - 8, cx + 2, y1 - 2], fill=col)
     rain(d, (x0, y0, x1, y1), 44, seed=5)
 
 def scene_kuwait(d, box):
@@ -214,6 +229,17 @@ def scene_kuwait(d, box):
     d.line([(dx - 20, dy - 8), (dx + 20, dy - 8)], fill=(35, 35, 40), width=2)
     d.ellipse([dx - 24, dy - 11, dx - 14, dy - 8], fill=(120, 120, 120))
     d.ellipse([dx + 14, dy - 11, dx + 24, dy - 8], fill=(120, 120, 120))
+    # second smaller drone, upper left + oil derrick, lower right (v4 density)
+    dx2, dy2 = x0 + 44, y0 + 16
+    d.ellipse([dx2 - 8, dy2 - 3, dx2 + 8, dy2 + 3], fill=(35, 35, 40))
+    d.line([(dx2 - 13, dy2 - 5), (dx2 + 13, dy2 - 5)], fill=(35, 35, 40), width=1)
+    d.ellipse([dx2 - 16, dy2 - 7, dx2 - 9, dy2 - 5], fill=(120, 120, 120))
+    d.ellipse([dx2 + 9, dy2 - 7, dx2 + 16, dy2 - 5], fill=(120, 120, 120))
+    ox = x1 - 108
+    d.line([(ox, y1 - 14), (ox + 6, y1 - 52)], fill=(40, 32, 28), width=2)
+    d.line([(ox + 14, y1 - 14), (ox + 6, y1 - 52)], fill=(40, 32, 28), width=2)
+    d.line([(ox, y1 - 14), (ox + 14, y1 - 14)], fill=(40, 32, 28), width=2)
+    d.line([(ox + 2, y1 - 30), (ox + 12, y1 - 30)], fill=(40, 32, 28), width=1)
     # explosion starburst near antenna
     ex, ey = x1 - 66, y1 - 46
     pts = []
@@ -259,16 +285,21 @@ def scene_eu(d, box):
     d.line([(ccx, ccy), (ccx, ccy - cr + 4)], fill=(40, 40, 40), width=2)
     d.line([(ccx, ccy), (ccx - 5, ccy - 3)], fill=(40, 40, 40), width=2)
     d.ellipse([ccx - 2, ccy - 2, ccx + 2, ccy + 2], fill=(40, 40, 40))
-    # far-side delegates: heads + shoulders above the table
+    # far-side delegates: bigger heads (~1.5x, v4) + shoulders above the table
     for fx in [cx - 104, cx - 52, cx, cx + 52, cx + 104]:
-        d.ellipse([fx - 5, y0 + 40, fx + 5, y0 + 50], fill=(235, 220, 195))
-        d.rounded_rectangle([fx - 11, y0 + 50, fx + 11, y0 + 58], radius=3,
+        d.ellipse([fx - 8, y0 + 37, fx + 8, y0 + 52], fill=(52, 44, 36))
+        d.ellipse([fx - 7, y0 + 41, fx + 7, y0 + 52], fill=(235, 220, 195))
+        d.rounded_rectangle([fx - 13, y0 + 51, fx + 13, y0 + 60], radius=3,
                             fill=(28, 28, 36))
+    # wall sconces (detail density, v4)
+    for sx in [x0 + 8, x1 - 8]:
+        d.ellipse([sx - 3, y0 + 44, sx + 3, y0 + 50], fill=(255, 215, 0))
     # table: dark side band (thickness) first, then the top surface
-    d.ellipse([cx - 130, y0 + 62, cx + 130, y0 + 86], fill=(74, 46, 22))
-    d.ellipse([cx - 130, y0 + 56, cx + 130, y0 + 80], fill=(120, 74, 40),
+    # (shrunk slightly in v4 to fund the bigger heads)
+    d.ellipse([cx - 124, y0 + 64, cx + 124, y0 + 88], fill=(74, 46, 22))
+    d.ellipse([cx - 124, y0 + 58, cx + 124, y0 + 82], fill=(120, 74, 40),
               outline=(70, 42, 20), width=2)
-    d.ellipse([cx - 122, y0 + 59, cx + 122, y0 + 77], outline=(160, 104, 58),
+    d.ellipse([cx - 116, y0 + 61, cx + 116, y0 + 79], outline=(160, 104, 58),
               width=1)
     # name plates on the table in front of each delegate
     for fx in [cx - 104, cx - 52, cx, cx + 52, cx + 104]:
@@ -289,8 +320,8 @@ def scene_eu(d, box):
         d.rounded_rectangle([fx - 12, y0 + 88, fx + 12, y1 - 2], radius=3,
                             fill=(24, 24, 32))
     # NO DEAL banner across the table front
-    d.rectangle([cx - 46, y0 + 84, cx + 46, y0 + 96], fill=(185, 28, 28))
-    d.text((cx, y0 + 90), "NO DEAL", font=SANS_B(11), fill=(255, 255, 255),
+    d.rectangle([cx - 46, y0 + 86, cx + 46, y0 + 98], fill=(185, 28, 28))
+    d.text((cx, y0 + 92), "NO DEAL", font=SANS_B(11), fill=(255, 255, 255),
            anchor="mm")
 
 def scene_kyiv(d, box):
@@ -306,44 +337,54 @@ def scene_kyiv(d, box):
         d.line([(sx, sy), (ex, ey)], fill=(255, 200, 120), width=2)
         d.ellipse([ex - 3, ey - 3, ex + 3, ey + 3], fill=(255, 220, 150))
         d.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=(255, 240, 200))
-    # fire glow bottom-left
+    # fire glow bottom-left + bottom-right, plus a middle cluster (v4 density)
     fire(d, x0 + 34, y1 - 2, 0.8)
     fire(d, x1 - 30, y1 - 2, 0.6)
+    fire(d, x0 + 92, y1 - 2, 0.5)
     smoke(d, x0 + 34, y1 - 34, 0.7, 3)
+    # searchlight beams sweeping the sky (v4 density)
+    d.line([(x0 + 18, y1 - 2), (x0 + 58, y0 + 6)], fill=(240, 240, 220), width=2)
+    d.line([(x1 - 18, y1 - 2), (x1 - 62, y0 + 8)], fill=(240, 240, 220), width=2)
 
 def scene_ebola(d, box):
-    """Treatment tent + health worker + red cross. Scene 5."""
+    """Treatment tent + health worker + red cross. Scene 5.
+    v4 full redraw: a real tent (vertical walls + pitched roof), NOT a
+    triangle. Red cross on the wall, PPE worker beside the tent, and the
+    "12,021" case count on a freestanding sign board OUTSIDE the tent."""
     x0, y0, x1, y1 = box
     vgrad(d, (x0, y0, x1, y1), (214, 196, 168), (168, 142, 110))
     d.rectangle([x0, y1 - 14, x1, y1], fill=(120, 96, 66))
-    # tent — low and wide so it reads as a tent, not a pyramid (v3 fix
-    # round 2: apex lowered from -52 to -38, base kept at +/-58)
-    tx, ty = (x0 + x1) // 2 - 14, y1 - 16
-    d.polygon([(tx - 58, ty), (tx, ty - 38), (tx + 58, ty)], fill=(238, 232, 214),
-              outline=(90, 80, 66))
-    d.polygon([(tx - 58, ty), (tx, ty - 38), (tx + 58, ty)], outline=(90, 80, 66))
-    d.line([(tx, ty - 38), (tx, ty - 32)], fill=(150, 140, 120), width=1)
-    d.line([(tx, ty - 38), (tx - 66, ty)], fill=(90, 80, 66), width=1)
-    d.line([(tx, ty - 38), (tx + 66, ty)], fill=(90, 80, 66), width=1)
-    d.ellipse([tx - 68, ty - 2, tx - 64, ty + 2], fill=(90, 80, 66))
-    d.ellipse([tx + 64, ty - 2, tx + 68, ty + 2], fill=(90, 80, 66))
-    # open flap: dark doorway with a lighter rolled edge
-    d.polygon([(tx - 18, ty), (tx, ty - 16), (tx + 18, ty)], fill=(52, 44, 38))
-    d.line([(tx - 18, ty), (tx, ty - 16)], fill=(200, 190, 165), width=2)
-    d.line([(tx + 18, ty), (tx, ty - 16)], fill=(200, 190, 165), width=2)
-    # bigger red cross on the tent face, above the doorway
-    d.rectangle([tx - 4, ty - 32, tx + 4, ty - 20], fill=RED)
-    d.rectangle([tx - 11, ty - 29, tx + 11, ty - 23], fill=RED)
-    # health worker (PPE)
-    wx = x1 - 34
-    d.ellipse([wx - 7, y1 - 52, wx + 7, y1 - 38], fill=(240, 240, 230))  # hood
-    d.rectangle([wx - 9, y1 - 38, wx + 9, y1 - 14], fill=(250, 250, 244))  # gown
-    d.rectangle([wx - 9, y1 - 34, wx - 4, y1 - 20], fill=(240, 240, 230))
-    d.rectangle([wx + 4, y1 - 34, wx + 9, y1 - 20], fill=(240, 240, 230))
-    # fence posts + sign
-    d.rectangle([x0 + 8, y1 - 30, x0 + 44, y1 - 18], fill=(250, 248, 240),
+    tx = x0 + 92
+    # tent walls: cream rectangle, base at ground line
+    d.rectangle([tx - 40, y1 - 40, tx + 40, y1 - 14], fill=(238, 232, 214),
                 outline=(90, 80, 66))
-    d.text((x0 + 26, y1 - 24), "12,021", font=SANS_B(9), fill=RED, anchor="mm")
+    # pitched roof: gentle triangle on top of the walls (not a pyramid)
+    d.polygon([(tx - 46, y1 - 40), (tx, y1 - 56), (tx + 46, y1 - 40)],
+              fill=(222, 212, 190), outline=(90, 80, 66))
+    d.line([(tx, y1 - 56), (tx, y1 - 40)], fill=(150, 140, 120), width=1)
+    # guy ropes from the roof eaves to the ground
+    d.line([(tx - 46, y1 - 40), (tx - 54, y1 - 14)], fill=(90, 80, 66), width=1)
+    d.line([(tx + 46, y1 - 40), (tx + 54, y1 - 14)], fill=(90, 80, 66), width=1)
+    # open flap: dark doorway with a lighter rolled edge
+    d.polygon([(tx - 12, y1 - 14), (tx, y1 - 32), (tx + 12, y1 - 14)],
+              fill=(52, 44, 38))
+    d.line([(tx - 12, y1 - 14), (tx, y1 - 32)], fill=(200, 190, 165), width=2)
+    d.line([(tx + 12, y1 - 14), (tx, y1 - 32)], fill=(200, 190, 165), width=2)
+    # red cross on the tent WALL (left of the door), not on the roof
+    d.rectangle([tx - 31, y1 - 34, tx - 25, y1 - 22], fill=RED)
+    d.rectangle([tx - 34, y1 - 31, tx - 22, y1 - 25], fill=RED)
+    # health worker (PPE) standing beside the tent, right side
+    wx = x1 - 14
+    d.ellipse([wx - 6, y1 - 50, wx + 6, y1 - 38], fill=(240, 240, 230))  # hood
+    d.rectangle([wx - 8, y1 - 38, wx + 8, y1 - 14], fill=(250, 250, 244))  # gown
+    d.rectangle([wx - 8, y1 - 34, wx - 3, y1 - 20], fill=(240, 240, 230))
+    d.rectangle([wx + 3, y1 - 34, wx + 8, y1 - 20], fill=(240, 240, 230))
+    # freestanding sign board with the case count, clear of the tent
+    d.rectangle([x0 + 6, y1 - 32, x0 + 46, y1 - 18], fill=(250, 248, 240),
+                outline=(90, 80, 66))
+    d.line([(x0 + 10, y1 - 18), (x0 + 10, y1 - 14)], fill=(90, 80, 66), width=1)
+    d.line([(x0 + 42, y1 - 18), (x0 + 42, y1 - 14)], fill=(90, 80, 66), width=1)
+    d.text((x0 + 26, y1 - 25), "12,021", font=SANS_B(9), fill=RED, anchor="mm")
 
 def scene_ecb(d, box):
     """Euro symbol + Frankfurt tower. Scene 6."""
@@ -361,6 +402,11 @@ def scene_ecb(d, box):
     d.text((x1 - 52, y0 + 66), "ECB", font=SANS_B(10), fill=(255, 255, 255), anchor="mm")
     # small skyline
     skyline(d, (x0 + 80, y1 - 18, x1, y1), [18, 26, 16], base_y=y1)
+    # second smaller tower + crescent moon (v4 density)
+    d.rectangle([x1 - 30, y0 + 40, x1 - 14, y1], fill=(26, 36, 60))
+    windows(d, x1 - 27, y0 + 44, 10, y1 - y0 - 48, 1, 4)
+    d.ellipse([x0 + 88, y0 + 8, x0 + 104, y0 + 24], fill=(240, 235, 200))
+    d.ellipse([x0 + 93, y0 + 6, x0 + 107, y0 + 22], fill=(18, 32, 64))
 
 def scene_korea(d, box):
     """Rate bar chart. Scene 7. (Caption below carries the title.)"""
@@ -369,6 +415,12 @@ def scene_korea(d, box):
     d.rectangle([x0, y0, x1, y1], outline=INK, width=1)
     base = y1 - 16
     vals = [("JUL", 2.50, 16), ("SEP", 2.75, 21), ("OCT", 3.00, 26), ("NOV", 3.25, 31)]
+    # gridlines + trend arrow (v4 density), drawn before the bars
+    for gy in [base - 10, base - 20, base - 30]:
+        d.line([(x0 + 8, gy), (x1 - 8, gy)], fill=(200, 196, 182), width=1)
+    d.line([(x0 + 22, base - 16), (x1 - 22, base - 31)], fill=RED, width=1)
+    d.polygon([(x1 - 22, base - 31), (x1 - 30, base - 31), (x1 - 22, base - 25)],
+              fill=RED)
     bw = 26
     gap = (x1 - x0 - 20 - 4 * bw) // 3
     x = x0 + 12
@@ -399,6 +451,9 @@ def scene_hk(d, box):
             cx = x0 + 62 + c * 11
             d.rectangle([cx - 2, yy, cx + 2, yy + 9], fill=(245, 240, 225))
             d.ellipse([cx - 2.5, yy - 5, cx + 2.5, yy], fill=(255, 190, 60))
+    # crescent moon, top-centre (v4 density)
+    d.ellipse([x0 + 68, y0 + 5, x0 + 84, y0 + 21], fill=(240, 235, 200))
+    d.ellipse([x0 + 73, y0 + 3, x0 + 87, y0 + 19], fill=(16, 18, 40))
 
 def scene_cairo(d, box):
     """Street memorial: candles + flowers for the 31 dead. Scene 9.
@@ -427,6 +482,10 @@ def scene_cairo(d, box):
                 fill=(40, 34, 40))
     d.text(((x0 + x1) // 2, y1 - 10), "31 LIVES", font=SANS_B(8),
            fill=(240, 230, 200), anchor="mm")
+    # minaret silhouette, left (v4 density)
+    mx = x0 + 10
+    d.rectangle([mx, y0 + 12, mx + 8, y1 - 18], fill=(70, 58, 52))
+    d.ellipse([mx - 2, y0 + 4, mx + 10, y0 + 14], fill=(70, 58, 52))
 
 def scene_bangkok(d, box):
     """Refinery towers + fire + smoke. Scene 10."""
@@ -446,6 +505,9 @@ def scene_bangkok(d, box):
     # smoke kept short so it stays inside the art box
     smoke(d, x0 + 52, y1 - 30, 0.7, 3)
     smoke(d, x1 - 36, y1 - 28, 0.6, 3)
+    # flare stack with flame on top (v4 density)
+    d.rectangle([x1 - 62, y1 - 62, x1 - 58, y1 - 14], fill=(52, 48, 54))
+    fire(d, x1 - 60, y1 - 60, 0.45)
     # ground
     d.rectangle([x0, y1 - 14, x1, y1], fill=(40, 36, 40))
 
@@ -464,7 +526,9 @@ def scene_chess(d, box):
                         fill=col)
     for (c, r, col) in [(4, 0, (255, 255, 255)), (3, 0, (255, 255, 255)),
                         (4, 7, (20, 20, 20)), (5, 7, (20, 20, 20)),
-                        (2, 3, (255, 255, 255)), (5, 4, (20, 20, 20))]:
+                        (2, 3, (255, 255, 255)), (5, 4, (20, 20, 20)),
+                        (1, 6, (255, 255, 255)), (6, 1, (20, 20, 20)),
+                        (0, 4, (255, 255, 255)), (7, 3, (20, 20, 20))]:
         cx, cy = bx + (c + 0.5) * sq, by + (r + 0.5) * sq
         d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=col,
                   outline=(120, 100, 60), width=1)
@@ -506,8 +570,17 @@ def scene_bogor(d, box):
     for wx in [x0 + 24, x1 - 26]:
         d.ellipse([wx - 5, y1 - 34, wx + 5, y1 - 24], fill=(255, 200, 60))
         d.rectangle([wx - 6, y1 - 24, wx + 6, y1 - 8], fill=(230, 110, 40))
+    # third worker (v4 density)
+    wx = x0 + 44
+    d.ellipse([wx - 5, y1 - 32, wx + 5, y1 - 22], fill=(255, 200, 60))
+    d.rectangle([wx - 6, y1 - 22, wx + 6, y1 - 8], fill=(230, 110, 40))
     # flood water
     d.rectangle([x0, y1 - 8, x1, y1], fill=(70, 96, 120))
+    # water ripples on top of the flood (v4 density)
+    for yy in [y1 - 6, y1 - 3]:
+        for xx in range(x0 + 6, x1 - 10, 26):
+            d.arc([xx, yy - 2, xx + 18, yy + 2], 180, 360, fill=(160, 190, 210),
+                  width=1)
 
 def scene_canary(d, box):
     """Boats at sea, El Hierro. Scene 13."""
@@ -534,10 +607,20 @@ def scene_canary(d, box):
     for yy in [y1 - 18, y1 - 10]:
         for xx in range(x0 + 6, x1 - 10, 22):
             d.arc([xx, yy - 3, xx + 16, yy + 3], 180, 360, fill=(220, 235, 245), width=1)
+    # third small boat far left + birds (v4 density)
+    bx, by, s = x0 + 30, y1 - 52, 0.55
+    d.polygon([(bx - 22 * s, by), (bx + 22 * s, by), (bx + 14 * s, by + 9 * s),
+               (bx - 14 * s, by + 9 * s)], fill=(120, 60, 40))
+    d.polygon([(bx - 2, by - 20 * s), (bx - 2, by), (bx + 12 * s, by)],
+              fill=(245, 242, 230))
+    for (bx2, by2) in [(x0 + 60, y0 + 12), (x0 + 84, y0 + 18), (x0 + 104, y0 + 10)]:
+        d.line([(bx2 - 5, by2), (bx2, by2 - 4), (bx2 + 5, by2)],
+               fill=(40, 50, 60), width=1)
 
 def scene_flinders(d, box):
-    """Landscape wildfire on Flinders Island: orange sky, tree line,
-    flame clusters + smoke columns. Scene 14 (v3)."""
+    """Landscape wildfire on Flinders Island: orange sky, darkened hills,
+    tall flame tongues + smoke columns + a "14,000 HA" plaque. Scene 14
+    (v4 redraw — must read as FIRE, not orange mountains)."""
     x0, y0, x1, y1 = box
     vgrad(d, (x0, y0, x1, y1), (214, 96, 36), (96, 34, 22))
     # ember dots in the sky
@@ -546,21 +629,75 @@ def scene_flinders(d, box):
         ex = rnd.uniform(x0 + 6, x1 - 6)
         ey = rnd.uniform(y0 + 4, y0 + 26)
         d.ellipse([ex - 1.5, ey - 1.5, ex + 1.5, ey + 1.5], fill=(255, 200, 90))
-    # dark tree line (eucalyptus silhouettes)
-    d.polygon([(x0, y1 - 26), (x0, y1 - 40), (x0 + 30, y1 - 48),
-               (x0 + 70, y1 - 38), (x0 + 110, y1 - 50), (x1, y1 - 40),
-               (x1, y1 - 26)], fill=(48, 26, 18))
+    # darkened hills (near-black silhouette, low profile)
+    d.polygon([(x0, y1 - 26), (x0, y1 - 36), (x0 + 30, y1 - 42),
+               (x0 + 70, y1 - 34), (x0 + 110, y1 - 44), (x1, y1 - 36),
+               (x1, y1 - 26)], fill=(30, 16, 10))
+    # burnt tree trunks with bare branches on the ridge
     for (tx, th) in [(x0 + 22, 12), (x0 + 58, 16), (x0 + 96, 11), (x1 - 30, 14)]:
-        d.line([(tx, y1 - 40), (tx, y1 - 40 - th)], fill=(48, 26, 18), width=2)
-        d.ellipse([tx - 7, y1 - 51 - th, tx + 7, y1 - 37 - th], fill=(48, 26, 18))
-    # ground + flame clusters
+        d.line([(tx, y1 - 38), (tx, y1 - 38 - th)], fill=(30, 16, 10), width=2)
+        d.line([(tx, y1 - 38 - th), (tx - 6, y1 - 44 - th)], fill=(30, 16, 10),
+               width=1)
+        d.line([(tx, y1 - 38 - th), (tx + 6, y1 - 44 - th)], fill=(30, 16, 10),
+               width=1)
+    # ground + tall flame tongues (three clusters, tallest in the middle)
     d.rectangle([x0, y1 - 26, x1, y1], fill=(64, 34, 20))
-    fire(d, x0 + 34, y1 - 22, 0.9)
-    fire(d, x0 + 82, y1 - 20, 1.1)
-    fire(d, x1 - 30, y1 - 22, 0.8)
-    # smoke columns kept short so they stay inside the art box
-    smoke(d, x0 + 82, y1 - 40, 0.8, 3)
-    smoke(d, x1 - 30, y1 - 38, 0.7, 3)
+    fire(d, x0 + 34, y1 - 22, 1.0)
+    fire(d, x0 + 82, y1 - 20, 1.15)
+    fire(d, x1 - 30, y1 - 22, 0.9)
+    # extra tall flame tongues between the clusters
+    for (fx, fh) in [(x0 + 58, 26), (x0 + 108, 22), (x1 - 56, 24)]:
+        d.polygon([(fx - 7, y1 - 22), (fx - 3, y1 - 22 - fh),
+                   (fx, y1 - 22 - fh - 8), (fx + 3, y1 - 22 - fh),
+                   (fx + 7, y1 - 22)], fill=(255, 200, 60))
+    # smoke columns rising from the flames, kept inside the art box
+    smoke(d, x0 + 82, y1 - 36, 0.7, 3)
+    smoke(d, x1 - 30, y1 - 34, 0.6, 3)
+    smoke(d, x0 + 34, y1 - 34, 0.6, 3)
+    # "14,000 HA" plaque, top-left below the HOW-SURE chip — drawn LAST
+    # so the tall flames do not hide it
+    d.rectangle([x0 + 6, y0 + 17, x0 + 66, y0 + 29], fill=(30, 20, 14),
+                outline=(255, 200, 60), width=1)
+    d.text((x0 + 36, y0 + 23), "14,000 HA", font=SANS_B(8), fill=GOLD,
+           anchor="mm")
+
+def scene_mumbai(d, box):
+    """India Gate at night + memorial candles + tricolour flag. Scene 15
+    (v4): the 18th anniversary of the 26/11 attacks falls exactly on
+    26 Nov 2026."""
+    x0, y0, x1, y1 = box
+    vgrad(d, (x0, y0, x1, y1), (16, 20, 44), (52, 48, 78))
+    stars(d, (x0, y0, x1, y0 + 24), 12, seed=61)
+    # India Gate: dark monument with a lit arch opening
+    gx0, gx1 = (x0 + x1) // 2 - 34, (x0 + x1) // 2 + 34
+    gy0, gy1 = y0 + 18, y1 - 16
+    d.rectangle([gx0, gy0, gx1, gy1], fill=(58, 48, 44))
+    d.ellipse([(gx0 + gx1) // 2 - 8, gy0 - 8, (gx0 + gx1) // 2 + 8, gy0 + 4],
+              fill=(58, 48, 44))
+    ax0, ax1 = (x0 + x1) // 2 - 12, (x0 + x1) // 2 + 12
+    d.rectangle([ax0, y0 + 34, ax1, gy1], fill=(255, 190, 90))
+    d.ellipse([ax0, y0 + 26, ax1, y0 + 42], fill=(255, 190, 90))
+    d.rectangle([ax0, y0 + 34, ax1, gy1], outline=(30, 24, 22), width=1)
+    # flag pole + tricolour, left side below the HOW-SURE chip
+    fx = x0 + 12
+    d.line([(fx, y0 + 24), (fx, y1 - 16)], fill=(200, 200, 190), width=2)
+    d.rectangle([fx, y0 + 26, fx + 20, y0 + 32], fill=(255, 153, 51))
+    d.rectangle([fx, y0 + 32, fx + 20, y0 + 38], fill=(245, 242, 230))
+    d.rectangle([fx, y0 + 38, fx + 20, y0 + 44], fill=(19, 136, 8))
+    d.ellipse([fx + 8, y0 + 33, fx + 12, y0 + 37], fill=(0, 0, 128))
+    # ground strip
+    d.rectangle([x0, y1 - 16, x1, y1], fill=(30, 26, 34))
+    # memorial candles in front of the monument
+    for c in range(7):
+        cx = x0 + 16 + c * 20
+        d.rectangle([cx - 2, y1 - 26, cx + 2, y1 - 16], fill=(245, 240, 225))
+        d.ellipse([cx - 2.5, y1 - 31, cx + 2.5, y1 - 26], fill=(255, 190, 60))
+    # flower dots between the candles
+    rnd = random.Random(63)
+    for c in range(6):
+        cx = x0 + 26 + c * 20
+        col = rnd.choice([(200, 60, 60), (240, 220, 230), (230, 180, 60)])
+        d.ellipse([cx - 3, y1 - 22, cx + 3, y1 - 16], fill=col)
 
 # ---------------------------------------------------------------- map
 # Hand-built land bitmap: 24 rows, lat 84..-54 in 6 deg steps; each row is
@@ -606,6 +743,7 @@ PINS = [  # (lon, lat, num, region, dx, dy) — dx/dy = display offset for legib
     (31.2, 30.05, 9, "NAF", 12, 7), (100.5, 13.75, 10, "SEA", 0, 0),
     (6.14, 46.2, 11, "EU", -10, 9), (106.8, -6.6, 12, "SEA", 0, 0),
     (-18, 28.3, 13, "EU", 0, 0), (148, -40, 14, "OC", 0, 0),
+    (72.8, 19.1, 15, "SA", 0, 0),
 ]
 
 def draw_map(d, box):
@@ -634,10 +772,10 @@ def draw_map(d, box):
         if dx or dy:
             d.line([(px, py), (qx, qy)], fill=(90, 86, 78), width=1)
             d.ellipse([px - 2, py - 2, px + 2, py + 2], fill=(90, 86, 78))
-        r = 8
+        r = 9
         d.ellipse([qx - r, qy - r, qx + r, qy + r], fill=REGION_COL[reg],
-                  outline=(255, 255, 255), width=1)
-        d.text((qx, qy), str(n), font=SANS_B(9), fill=(255, 255, 255), anchor="mm")
+                  outline=(255, 255, 255), width=2)
+        d.text((qx, qy), str(n), font=SANS_B(10), fill=(255, 255, 255), anchor="mm")
 
 # ---------------------------------------------------------------- data
 HEROES = [
@@ -660,7 +798,7 @@ HEROES = [
 SCENES = [
     dict(num=4, art=scene_kyiv, date="KYIV — 26 NOV", chip="CF",
          head="MISSILES HIT KYIV",
-         sub="Ballistic missiles wound 7; Zelenskyy warns of a mass strike"),
+         sub="Ballistic missiles wound 7"),
     dict(num=5, art=scene_ebola, date="DRC — 26 NOV", chip="OF",
          head="EBOLA PASSES 12,000 CASES",
          sub="5,904 dead; fastest-growing outbreak on record"),
@@ -691,38 +829,42 @@ SCENES = [
     dict(num=14, art=scene_flinders, date="FLINDERS ISLAND — 26 NOV", chip="CF",
          head="FLINDERS FIRE: 14,000 HA",
          sub="Six homes lost; 10-m flames"),
+    dict(num=15, art=scene_mumbai, date="MUMBAI — 26 NOV", chip="CF",
+         head="MUMBAI MARKS 26/11",
+         sub="18 years on; 166 killed, tributes at the Taj"),
 ]
 ALSO = [
-    (3, "CF", "NFL — Bears 39–35 Lions, Eagles 39–38 Cowboys, Bills 13–10 Chiefs: three final-minute thrillers"),
-    (5, "CF", "MUMBAI — 18 years since 26/11; city on high alert, tributes at the Taj"),
-    (9, "CF", "GAZA — Israeli strikes kill 9–10, incl. Hamas minister Abu Nada"),
-    (12, "CF", "IRBIL — Thousands protest as Baghdad seizes Kurdish oil and borders"),
-    (15, "CF", "BISSAU — Junta postpones elections to Nov 2028, a year after the coup"),
-    (16, "CF", "ITURI — UN peacekeepers step up protection as fighting displaces thousands"),
-    (17, "CF", "SENEGAL — Record November crossings as young risk the Atlantic"),
-    (20, "CF", "MYANMAR — Won't fully comply with ICJ genocide orders"),
+    (3, "CF", "NFL — Bears 39–35 Lions, Eagles 39–38 Cowboys, Bills 13–10 Chiefs (ClutchPoints)"),
+    (9, "CF", "GAZA — Israeli strikes kill 9–10, incl. Hamas minister Abu Nada (TBS)"),
+    (12, "CF", "IRBIL — Thousands protest as Baghdad seizes Kurdish oil and borders (Reuters)"),
+    (15, "CF", "BISSAU — Junta postpones elections to Nov 2028, a year after the coup (Reuters)"),
+    (16, "CF", "ITURI — UN peacekeepers step up protection as fighting displaces thousands (UN News)"),
+    (17, "CF", "SENEGAL — Record November crossings as young risk the Atlantic (AP)"),
+    (20, "CF", "MYANMAR — Won't fully comply with ICJ genocide orders; ruling was 19 Nov (BusinessWorld)"),
     (22, "CF", "PYONGYANG — Kim calls tactical-nuke deployment 'urgent' (KCNA)"),
-    (24, "OF", "LONDON — Net migration falls to 77,000, lowest since 1997"),
-    (25, "CF", "PARIS — Depardieu ordered to stand trial for alleged 2018 rape"),
-    (27, "CF", "MEXICO CITY — Sheinbaum blasts DEA tip lines as 'interference'"),
-    (28, "OF", "HAITI — WHO chief pledges $1m for last major public hospital"),
-    (29, "CF", "TARIFFS — China, EU reject new 14-economy US tariff plan (reactions)"),
-    (30, "CF", "MIAMI — FedEx delays top 3½ hours after jet overruns runway"),
-    (31, "CF", "COLOGNE — Two arrested over alleged synagogue bomb plot"),
-    (34, "OF", "SHIPPING — UNCTAD: maritime trade to stall at zero growth in 2026"),
-    (35, "CF", "EUROPA LEAGUE — Bournemouth stay perfect; Milan, Juve fight back"),
-    (36, "OF", "LONDON — UK–EU treaty texts published with 10-year exit clause"),
-    (37, "CF", "IBIZA — Diesel tanker capsizes; one crew member dies"),
-    (38, "CF", "STOCKHOLM — Centre backs Kristersson for PM in major shift"),
-    (39, "CF", "LASK — Poland takes delivery of more F-35s; fleet now 12"),
-    (41, "CF", "NEW DELHI — India probes Netflix over content rules"),
-    (42, "CF", "DHAKA — Fresh garment-wage protests met with tear gas"),
-    (43, "CF", "WASHINGTON — Trump calls revised GDP data 'fake', demands probe"),
-    (44, "CF", "TENNIS — Sinner to miss Australian Open after knee surgery"),
-    (46, "CF", "NAIROBI — Kenya court halts US-backed Ebola quarantine site; 50-bed Laikipia base frozen"),
-    (47, "CF", "BRUSSELS — Meloni rebukes Kyiv at EU summit as Libya vows retaliation for Benghazi strike"),
-    (48, "CF", "CAMBRIDGE — UK train attacker guilty of 14 counts of attempted murder; 10 stabbed"),
-    (49, "CF", "LONDON — Tube strike: Circle & Piccadilly shut all day; no Tube after 9pm"),
+    (24, "OF", "LONDON — Net migration falls to 77,000, lowest since 1997 (Reuters)"),
+    (25, "CF", "PARIS — Depardieu, 77, ordered to stand trial for alleged 2018 rape (People)"),
+    (27, "CF", "MEXICO CITY — Sheinbaum blasts DEA tip lines as 'interference' (Hoy MX)"),
+    (28, "OF", "HAITI — WHO chief pledges $1m for last major public hospital (UN News)"),
+    (29, "CF", "TARIFFS — China, EU reject new 14-economy US tariff plan (Reuters)"),
+    (30, "CF", "MIAMI — FedEx delays top 3½ hours after jet overruns runway (Simple Flying)"),
+    (31, "CF", "COLOGNE — Two arrested over alleged synagogue bomb plot (Reuters)"),
+    (34, "OF", "SHIPPING — UNCTAD: maritime trade to stall at zero growth in 2026 (UN News)"),
+    (35, "CF", "EUROPA LEAGUE — Bournemouth stay perfect (5 from 5); Milan, Juve fight back (Reuters)"),
+    (36, "OF", "LONDON — UK–EU treaty texts published with 10-year exit clause (AJ Bell)"),
+    (37, "CF", "IBIZA — Diesel tanker capsizes; 1 dead, 17 rescued, 7,000t diesel aboard (OilPrice)"),
+    (38, "CF", "STOCKHOLM — Centre backs Kristersson for PM; parliament votes Monday (Reuters)"),
+    (39, "CF", "LASK — Poland takes delivery of more F-35s; fleet now 12 (Defence24)"),
+    (41, "CF", "NEW DELHI — India asks Netflix not to air Pakistani drama (Reuters)"),
+    (42, "CF", "DHAKA — Fresh garment-wage protests met with tear gas; 36% rise rejected (Reuters)"),
+    (43, "CF", "WASHINGTON — Trump calls revised GDP data 'fake', demands probe (Reuters)"),
+    (44, "CF", "TENNIS — Sinner to miss Australian Open after knee surgery (EuropeSays)"),
+    (46, "CF", "NAIROBI — Kenya court halts US-backed Ebola site; 50-bed base frozen (Reuters)"),
+    (47, "CF", "BRUSSELS — Meloni rebukes Kyiv at EU summit; Libya vows Benghazi retaliation (AP)"),
+    (48, "CF", "CAMBRIDGE — Train attacker guilty of 14 attempted-murder counts; 10 stabbed (Reuters)"),
+    (49, "CF", "LONDON — Tube strike: Circle & Piccadilly shut all day; no Tube after 9pm (TfL)"),
+    (50, "CF", "NVIDIA — Halts AI server shipments to 4 nations; US chip curbs bite (FT)"),
+    (51, "CF", "GULF — Six killed in plane crash; bodies found off Mississippi (AP)"),
 ]
 DATECHECK = [
     "25 Nov — US tariff plan on 14 economies",
@@ -739,6 +881,8 @@ DATECHECK = [
     "24 Nov — Venezuela debt framework published",
     "25 Nov — FCC Starlink clearance (1m satellites)",
     "25 Nov — Malaysia sues Google (2 lawsuits)",
+    "25 Nov — Hera crater images released (ESA)",
+    "27 Nov — Nothing from Friday is on this page",
 ]
 NUMBERS = [
     ("750,000+", "WITHOUT POWER IN US STORM"),
@@ -749,10 +893,10 @@ NUMBERS = [
     ("3.25%", "BANK OF KOREA RATE"),
 ]
 REGIONS = [
-    ("N. AMERICA", 6, (31, 78, 121)), ("EUROPE", 13, (46, 107, 52)),
+    ("N. AMERICA", 7, (31, 78, 121)), ("EUROPE", 13, (46, 107, 52)),
     ("M. EAST", 5, (139, 69, 19)), ("N. AFRICA", 2, (176, 141, 87)),
     ("SUB-SAHARAN", 5, (122, 62, 157)), ("E. ASIA", 3, (185, 28, 28)),
-    ("SE ASIA", 3, (14, 116, 144)), ("S. ASIA", 3, (194, 65, 12)),
+    ("SE ASIA", 4, (14, 116, 144)), ("S. ASIA", 3, (194, 65, 12)),
     ("LATAM", 2, (77, 124, 15)), ("OCEANIA", 1, (0, 128, 128)),
     ("SPORT", 3, (51, 65, 85)), ("GLOBAL", 2, (90, 90, 90)),
 ]
@@ -774,7 +918,7 @@ def build():
     d.rectangle([0, y, W, y + 28], fill=NAVY)
     d.text((10, y + 14), "THE WORLD IN ONE DAY", font=SANS_B(13),
            fill=(255, 255, 255), anchor="lm")
-    rt = "THURSDAY 26 NOVEMBER 2026 · 48 STORIES · 12 REGIONS · 16 FIELDS · 1 DAY"
+    rt = "THURSDAY 26 NOVEMBER 2026 · 50 STORIES · 12 REGIONS · 16 FIELDS · 1 DAY"
     d.text((W - 10, y + 14), rt, font=SANS_B(10), fill=GOLD, anchor="rm")
     y += 28
     # --- masthead (centred two-tone date)
@@ -844,7 +988,7 @@ def build():
             ty += 11
         d.text((x + 6, hy + 198 - 9), h["src"], font=SANS(7), fill=GREY, anchor="la")
     y = hy + 198 + 4
-    # --- scenes grid 6x2 (v3: 11 scenes)
+    # --- scenes grid 6x2 (v4: 12 scenes)
     sw, sh = 162, 108
     for idx, s in enumerate(SCENES):
         r, c = divmod(idx, 6)
@@ -873,9 +1017,9 @@ def build():
     draw_map(d, (8, y, W - 8, y + 88))
     y += 88 + 4
     # --- ALSO list
-    d.text((8, y), "ALSO ON 26 NOVEMBER — 30 MORE STORIES",
+    d.text((8, y), "ALSO ON 26 NOVEMBER — 31 MORE STORIES",
            font=SANS_B(12), fill=NAVY, anchor="la")
-    d.text((W - 8, y), "18 pictured above + 30 below = 48 stories",
+    d.text((W - 8, y), "19 pictured above + 31 below = 50 stories",
            font=SANS_I(9), fill=GREY, anchor="ra")
     y += 15
     colw = (W - 16 - 3 * 10) / 4
@@ -896,14 +1040,14 @@ def build():
            font=SANS_B(10), fill=RED, anchor="la")
     for i, item in enumerate(DATECHECK):
         col, row = divmod(i, 5)
-        x = 14 + col * ((W - 28) / 3)
+        x = 14 + col * ((W - 28) / 4)
         d.text((x, y + 19 + row * 7), "• " + item, font=SANS(8), fill=INK, anchor="la")
     y += 58 + 3
     # --- footer
     d.text((8, y), "HOW SURE:  OFFICIAL = authority's own word  ·  CONFIRMED = 2+ outlets  ·  REPORTED = 1 outlet  ·  CLAIM = one side's account, not verified  (ALSO list: OF/CF/RP/CL = same scale)",
            font=SANS(8), fill=GREY, anchor="la")
     y += 10
-    d.text((8, y), "Sources: AP · Reuters · BBC · AFP · CNN · The Guardian · USA Today · Euronews · Al Jazeera · SCMP · Yonhap · KCNA · UN News · ABC · AAP · TBS News · The Hindu · OkayAfrica · FlightAware · BusinessWorld",
+    d.text((8, y), "Sources: AP · Reuters · BBC · AFP · CNN · The Guardian · USA Today · Euronews · Al Jazeera · SCMP · Yonhap · KCNA · UN News · ABC · AAP · TBS News · The Hindu · OkayAfrica · FlightAware · BusinessWorld · FT · Straits Times",
            font=SANS(8), fill=GREY, anchor="la")
     y += 10
     d.text((8, y), "Every story happened or was first reported on Thursday 26 November 2026. Drawn scenes are illustrations, not photos.",
