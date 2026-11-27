@@ -1,6 +1,9 @@
 # frontpage26_v2.py — THE WORLD IN ONE DAY, Thursday 26 November 2026
 # Fresh rebuild from zero (v2). Written 100% fresh from dossier.md +
 # dossier-add.md + v2-spec.md. No previous builder was read.
+# v3 edits (2026-11-27): 48 stories / 12 regions / 16 fields, 6 real UTC
+# times, 14th pictured scene (Flinders), balloon face, Ebola tent fix,
+# 20-outlet footer, DATE CHECK 14 traps — per v3-spec.md. v2 layout kept.
 # Draws a dense illustrated broadsheet front page, 1024x1024, Pillow only.
 import math, random
 from PIL import Image, ImageDraw, ImageFont
@@ -161,7 +164,8 @@ def scene_macys(d, box):
                         (x1 - 46, y0 + 26, 15), (x1 - 26, y0 + 20, 11)]:
         d.ellipse([cx - r, cy - r * 0.55, cx + r, cy + r * 0.55], fill=(52, 62, 88))
     skyline(d, (x0, y1 - 52, x1, y1), [46, 30, 52, 38, 44, 28, 50, 34], base_y=y1)
-    # big red balloon
+    # big red balloon — now with a face (the most memorable element of
+    # the top-4 entry's balloon character) and a bigger "100" badge
     bx, by = (x0 + x1) // 2, y0 + 52
     d.ellipse([bx - 52, by - 20, bx + 52, by + 20], fill=(178, 34, 34),
               outline=(120, 18, 18), width=2)
@@ -169,7 +173,16 @@ def scene_macys(d, box):
     d.polygon([(bx - 14, by + 20), (bx + 14, by + 20), (bx, by + 34)], fill=(120, 18, 18))
     d.rectangle([bx - 8, by + 34, bx + 8, by + 42], outline=(60, 30, 10), width=1)
     d.line([(bx - 30, by + 6), (bx - 52, by + 14)], fill=(230, 230, 230), width=1)
-    rain(d, (x0, y0, x1, y1), 30, seed=5)
+    # face: two eyes + smile on the balloon
+    for ex in [bx - 18, bx + 18]:
+        d.ellipse([ex - 6, by - 6, ex + 6, by + 6], fill=(255, 255, 255))
+        d.ellipse([ex - 2.5, by - 2.5, ex + 2.5, by + 2.5], fill=(30, 20, 20))
+    d.arc([bx - 14, by + 2, bx + 14, by + 14], 20, 160, fill=(255, 255, 255), width=2)
+    # gold "100" badge, bottom-right of the art
+    d.ellipse([x1 - 42, y1 - 30, x1 - 14, y1 - 2], fill=GOLD,
+              outline=(120, 90, 20), width=2)
+    d.text((x1 - 28, y1 - 16), "100", font=SANS_B(12), fill=NAVY, anchor="mm")
+    rain(d, (x0, y0, x1, y1), 44, seed=5)
 
 def scene_kuwait(d, box):
     """Desert dusk, radar + antenna, drone, explosion starburst. Hero 2."""
@@ -303,15 +316,24 @@ def scene_ebola(d, box):
     x0, y0, x1, y1 = box
     vgrad(d, (x0, y0, x1, y1), (214, 196, 168), (168, 142, 110))
     d.rectangle([x0, y1 - 14, x1, y1], fill=(120, 96, 66))
-    # tent
+    # tent — low and wide so it reads as a tent, not a pyramid (v3 fix
+    # round 2: apex lowered from -52 to -38, base kept at +/-58)
     tx, ty = (x0 + x1) // 2 - 14, y1 - 16
-    d.polygon([(tx - 58, ty), (tx, ty - 52), (tx + 58, ty)], fill=(238, 232, 214),
+    d.polygon([(tx - 58, ty), (tx, ty - 38), (tx + 58, ty)], fill=(238, 232, 214),
               outline=(90, 80, 66))
-    d.polygon([(tx - 58, ty), (tx, ty - 52), (tx + 58, ty)], outline=(90, 80, 66))
-    d.polygon([(tx - 16, ty), (tx, ty - 22), (tx + 16, ty)], fill=(60, 52, 44))
-    # red cross on tent
-    d.rectangle([tx - 3, ty - 44, tx + 3, ty - 32], fill=RED)
-    d.rectangle([tx - 9, ty - 41, tx + 9, ty - 35], fill=RED)
+    d.polygon([(tx - 58, ty), (tx, ty - 38), (tx + 58, ty)], outline=(90, 80, 66))
+    d.line([(tx, ty - 38), (tx, ty - 32)], fill=(150, 140, 120), width=1)
+    d.line([(tx, ty - 38), (tx - 66, ty)], fill=(90, 80, 66), width=1)
+    d.line([(tx, ty - 38), (tx + 66, ty)], fill=(90, 80, 66), width=1)
+    d.ellipse([tx - 68, ty - 2, tx - 64, ty + 2], fill=(90, 80, 66))
+    d.ellipse([tx + 64, ty - 2, tx + 68, ty + 2], fill=(90, 80, 66))
+    # open flap: dark doorway with a lighter rolled edge
+    d.polygon([(tx - 18, ty), (tx, ty - 16), (tx + 18, ty)], fill=(52, 44, 38))
+    d.line([(tx - 18, ty), (tx, ty - 16)], fill=(200, 190, 165), width=2)
+    d.line([(tx + 18, ty), (tx, ty - 16)], fill=(200, 190, 165), width=2)
+    # bigger red cross on the tent face, above the doorway
+    d.rectangle([tx - 4, ty - 32, tx + 4, ty - 20], fill=RED)
+    d.rectangle([tx - 11, ty - 29, tx + 11, ty - 23], fill=RED)
     # health worker (PPE)
     wx = x1 - 34
     d.ellipse([wx - 7, y1 - 52, wx + 7, y1 - 38], fill=(240, 240, 230))  # hood
@@ -353,8 +375,10 @@ def scene_korea(d, box):
     for (lab, v, h) in vals:
         col = RED if lab == "NOV" else NAVY
         d.rectangle([x, base - h, x + bw, base], fill=col)
-        # value label INSIDE the bar (white) so it can't hit the badge
-        d.text((x + bw / 2, base - h + 2), f"{v:.2f}%", font=SANS_B(8),
+        # value label INSIDE the bar (white) so it can't hit the badge;
+        # NOV's label sits lower — the top of its bar is under the scene badge
+        ly = base - 12 if lab == "NOV" else base - h + 2
+        d.text((x + bw / 2, ly), f"{v:.2f}%", font=SANS_B(8),
                fill=(255, 255, 255), anchor="ma")
         d.text((x + bw / 2, base + 3), lab, font=SANS(7), fill=GREY, anchor="ma")
         x += bw + gap
@@ -367,11 +391,12 @@ def scene_hk(d, box):
     # building silhouette
     d.rectangle([x0 + 8, y0 + 18, x0 + 52, y1 - 22], fill=(24, 26, 48))
     windows(d, x0 + 12, y0 + 22, 36, y1 - y0 - 48, 3, 5)
-    # candle rows (caption below already says 168 dead)
+    # candle rows (caption below already says 168 dead) — tighter spacing
+    # for the narrower v3 grid cell
     for r in range(3):
         yy = y1 - 34 + r * 12
         for c in range(9):
-            cx = x0 + 66 + c * 14
+            cx = x0 + 62 + c * 11
             d.rectangle([cx - 2, yy, cx + 2, yy + 9], fill=(245, 240, 225))
             d.ellipse([cx - 2.5, yy - 5, cx + 2.5, yy], fill=(255, 190, 60))
 
@@ -383,12 +408,12 @@ def scene_cairo(d, box):
     # wall
     d.rectangle([x0, y0 + 26, x1, y1 - 18], fill=(96, 80, 72))
     d.line([(x0, y0 + 26), (x1, y0 + 26)], fill=(70, 58, 52), width=2)
-    # flowers (small coloured dots in rows)
+    # flowers (small coloured dots in rows) — tighter spacing for v3 grid
     rnd = random.Random(99)
     for r in range(2):
         yy = y0 + 34 + r * 12
         for c in range(10):
-            cx = x0 + 14 + c * 17
+            cx = x0 + 14 + c * 15
             col = rnd.choice([(200, 60, 60), (240, 220, 230), (230, 180, 60),
                               (180, 60, 120)])
             d.ellipse([cx - 3, yy - 3, cx + 3, yy + 3], fill=col)
@@ -510,6 +535,33 @@ def scene_canary(d, box):
         for xx in range(x0 + 6, x1 - 10, 22):
             d.arc([xx, yy - 3, xx + 16, yy + 3], 180, 360, fill=(220, 235, 245), width=1)
 
+def scene_flinders(d, box):
+    """Landscape wildfire on Flinders Island: orange sky, tree line,
+    flame clusters + smoke columns. Scene 14 (v3)."""
+    x0, y0, x1, y1 = box
+    vgrad(d, (x0, y0, x1, y1), (214, 96, 36), (96, 34, 22))
+    # ember dots in the sky
+    rnd = random.Random(55)
+    for _ in range(10):
+        ex = rnd.uniform(x0 + 6, x1 - 6)
+        ey = rnd.uniform(y0 + 4, y0 + 26)
+        d.ellipse([ex - 1.5, ey - 1.5, ex + 1.5, ey + 1.5], fill=(255, 200, 90))
+    # dark tree line (eucalyptus silhouettes)
+    d.polygon([(x0, y1 - 26), (x0, y1 - 40), (x0 + 30, y1 - 48),
+               (x0 + 70, y1 - 38), (x0 + 110, y1 - 50), (x1, y1 - 40),
+               (x1, y1 - 26)], fill=(48, 26, 18))
+    for (tx, th) in [(x0 + 22, 12), (x0 + 58, 16), (x0 + 96, 11), (x1 - 30, 14)]:
+        d.line([(tx, y1 - 40), (tx, y1 - 40 - th)], fill=(48, 26, 18), width=2)
+        d.ellipse([tx - 7, y1 - 51 - th, tx + 7, y1 - 37 - th], fill=(48, 26, 18))
+    # ground + flame clusters
+    d.rectangle([x0, y1 - 26, x1, y1], fill=(64, 34, 20))
+    fire(d, x0 + 34, y1 - 22, 0.9)
+    fire(d, x0 + 82, y1 - 20, 1.1)
+    fire(d, x1 - 30, y1 - 22, 0.8)
+    # smoke columns kept short so they stay inside the art box
+    smoke(d, x0 + 82, y1 - 40, 0.8, 3)
+    smoke(d, x1 - 30, y1 - 38, 0.7, 3)
+
 # ---------------------------------------------------------------- map
 # Hand-built land bitmap: 24 rows, lat 84..-54 in 6 deg steps; each row is
 # a list of (first_col, last_col) land spans, cols = 5 deg lon steps
@@ -542,17 +594,18 @@ LAND_BITMAP = [
 ]
 REGION_COL = {
     "NA": (31, 78, 121), "EU": (46, 107, 52), "ME": (139, 69, 19),
-    "AF": (122, 62, 157), "EA": (185, 28, 28), "SEA": (14, 116, 144),
-    "SA": (194, 65, 12), "LAT": (77, 124, 15), "SP": (51, 65, 85),
+    "AF": (122, 62, 157), "NAF": (176, 141, 87), "EA": (185, 28, 28),
+    "SEA": (14, 116, 144), "SA": (194, 65, 12), "LAT": (77, 124, 15),
+    "SP": (51, 65, 85), "OC": (0, 128, 128), "GL": (90, 90, 90),
 }
 PINS = [  # (lon, lat, num, region, dx, dy) — dx/dy = display offset for legibility
     (-74, 40.7, 1, "NA", 0, 0), (47.5, 29.3, 2, "ME", 0, 0),
     (4.35, 50.85, 3, "EU", -8, -9), (30.5, 50.45, 4, "EU", 0, 0),
     (25, 0, 5, "AF", 0, 0), (8.68, 50.11, 6, "EU", 16, -5),
     (127, 37.5, 7, "EA", 0, 0), (114.2, 22.3, 8, "EA", 0, 0),
-    (31.2, 30.05, 9, "AF", 12, 7), (100.5, 13.75, 10, "SEA", 0, 0),
+    (31.2, 30.05, 9, "NAF", 12, 7), (100.5, 13.75, 10, "SEA", 0, 0),
     (6.14, 46.2, 11, "EU", -10, 9), (106.8, -6.6, 12, "SEA", 0, 0),
-    (-18, 28.3, 13, "EU", 0, 0),
+    (-18, 28.3, 13, "EU", 0, 0), (148, -40, 14, "OC", 0, 0),
 ]
 
 def draw_map(d, box):
@@ -618,7 +671,7 @@ SCENES = [
          head="KOREA LIFTS RATE TO 3.25%",
          sub="Third hike since July; 2027 growth seen at 4.1%"),
     dict(num=8, art=scene_hk, date="HONG KONG — 26 NOV", chip="CF",
-         head="ONE YEAR AFTER WANG FUK FIRE",
+         head="WANG FUK FIRE, ONE YEAR ON",
          sub="168 dead remembered; flowers at Tai Po"),
     dict(num=9, art=scene_cairo, date="CAIRO — 26 NOV", chip="CF",
          head="CAIRO MOURNS 31 KILLED",
@@ -627,7 +680,7 @@ SCENES = [
          head="REFINERY BLAST INJURES 7–9",
          sub="Bangchak shuts all units; cause unknown"),
     dict(num=11, art=scene_chess, date="GENEVA — 26 NOV", chip="CF",
-         head="GUKESH–SINDAROV: 60-MOVE DRAW",
+         head="GUKESH–SINDAROV DRAW",
          sub="Game 3 drawn; match level at 1.5–1.5"),
     dict(num=12, art=scene_bogor, date="BOGOR — 26 NOV", chip="CF",
          head="MINE TOLL RISES TO 13",
@@ -635,6 +688,9 @@ SCENES = [
     dict(num=13, art=scene_canary, date="EL HIERRO — 26 NOV", chip="CF",
          head="CANARIES PASS 16,000 IN NOV",
          sub="Busiest month on the Atlantic route"),
+    dict(num=14, art=scene_flinders, date="FLINDERS ISLAND — 26 NOV", chip="CF",
+         head="FLINDERS FIRE: 14,000 HA",
+         sub="Six homes lost; 10-m flames"),
 ]
 ALSO = [
     (3, "CF", "NFL — Bears 39–35 Lions, Eagles 39–38 Cowboys, Bills 13–10 Chiefs: three final-minute thrillers"),
@@ -658,9 +714,15 @@ ALSO = [
     (36, "OF", "LONDON — UK–EU treaty texts published with 10-year exit clause"),
     (37, "CF", "IBIZA — Diesel tanker capsizes; one crew member dies"),
     (38, "CF", "STOCKHOLM — Centre backs Kristersson for PM in major shift"),
+    (39, "CF", "LASK — Poland takes delivery of more F-35s; fleet now 12"),
+    (41, "CF", "NEW DELHI — India probes Netflix over content rules"),
     (42, "CF", "DHAKA — Fresh garment-wage protests met with tear gas"),
     (43, "CF", "WASHINGTON — Trump calls revised GDP data 'fake', demands probe"),
     (44, "CF", "TENNIS — Sinner to miss Australian Open after knee surgery"),
+    (46, "CF", "NAIROBI — Kenya court halts US-backed Ebola quarantine site; 50-bed Laikipia base frozen"),
+    (47, "CF", "BRUSSELS — Meloni rebukes Kyiv at EU summit as Libya vows retaliation for Benghazi strike"),
+    (48, "CF", "CAMBRIDGE — UK train attacker guilty of 14 counts of attempted murder; 10 stabbed"),
+    (49, "CF", "LONDON — Tube strike: Circle & Piccadilly shut all day; no Tube after 9pm"),
 ]
 DATECHECK = [
     "25 Nov — US tariff plan on 14 economies",
@@ -673,6 +735,10 @@ DATECHECK = [
     "24 Nov — Huawei convicted (10 of 12 counts)",
     "23 Nov — Bogor mine flood",
     "23 Nov — COP31 collapse · NATO session · Merkury sunk",
+    "25 Nov — Eurostar walkout (6–9 trains cancelled)",
+    "24 Nov — Venezuela debt framework published",
+    "25 Nov — FCC Starlink clearance (1m satellites)",
+    "25 Nov — Malaysia sues Google (2 lawsuits)",
 ]
 NUMBERS = [
     ("750,000+", "WITHOUT POWER IN US STORM"),
@@ -683,19 +749,21 @@ NUMBERS = [
     ("3.25%", "BANK OF KOREA RATE"),
 ]
 REGIONS = [
-    ("N. AMERICA", 6, (31, 78, 121)), ("EUROPE", 10, (46, 107, 52)),
-    ("M. EAST", 5, (139, 69, 19)), ("AFRICA", 5, (122, 62, 157)),
-    ("E. ASIA", 3, (185, 28, 28)), ("SE ASIA", 3, (14, 116, 144)),
-    ("S. ASIA", 2, (194, 65, 12)), ("LATAM", 2, (77, 124, 15)),
-    ("SPORT", 5, (51, 65, 85)),
+    ("N. AMERICA", 6, (31, 78, 121)), ("EUROPE", 13, (46, 107, 52)),
+    ("M. EAST", 5, (139, 69, 19)), ("N. AFRICA", 2, (176, 141, 87)),
+    ("SUB-SAHARAN", 5, (122, 62, 157)), ("E. ASIA", 3, (185, 28, 28)),
+    ("SE ASIA", 3, (14, 116, 144)), ("S. ASIA", 3, (194, 65, 12)),
+    ("LATAM", 2, (77, 124, 15)), ("OCEANIA", 1, (0, 128, 128)),
+    ("SPORT", 3, (51, 65, 85)), ("GLOBAL", 2, (90, 90, 90)),
 ]
 UTC_EVENTS = [
-    ("EARLY", "Ibiza tanker capsizes; 1 dies"),
-    ("MORNING", "Nor'easter peaks; 750,000+ dark"),
-    ("07:45 UTC", "Bangkok refinery blast; 7–9 hurt"),
-    ("26 NOV", "Ebola passes 12,000 in DRC"),
-    ("EVENING", "Europa League: Bournemouth 5 from 5"),
-    ("26 NOV", "EU summit ends: no deal"),
+    ("00:41", "Flinders fire: six homes lost"),
+    ("01:00", "Bank of Korea lifts rate to 3.25%"),
+    ("07:45", "Bangkok refinery blast; 7–9 hurt"),
+    ("09:30", "ONS: UK migration falls to 77,000"),
+    ("12:00", "Tube strike begins; Circle & Piccadilly shut"),
+    ("13:30", "Macy's parade due to step off — postponed"),
+    ("EVENING", "EU summit ends: no deal"),
 ]
 
 def build():
@@ -706,7 +774,7 @@ def build():
     d.rectangle([0, y, W, y + 28], fill=NAVY)
     d.text((10, y + 14), "THE WORLD IN ONE DAY", font=SANS_B(13),
            fill=(255, 255, 255), anchor="lm")
-    rt = "41 STORIES · NINE REGIONS · ALL FROM THURSDAY 26 NOVEMBER 2026"
+    rt = "THURSDAY 26 NOVEMBER 2026 · 48 STORIES · 12 REGIONS · 16 FIELDS · 1 DAY"
     d.text((W - 10, y + 14), rt, font=SANS_B(10), fill=GOLD, anchor="rm")
     y += 28
     # --- masthead (centred two-tone date)
@@ -731,18 +799,18 @@ def build():
             d.text((x + cw / 2, y + 30 + j * 9), ln, font=SANS_B(8),
                    fill=(255, 255, 255), anchor="ma")
     y += 48
-    # --- region bar
-    rw = (W - 16 - 8 * 2) / 9
+    # --- region bar (12 chips, v3)
+    rw = (W - 16 - 11 * 2) / 12
     for i, (name, n, col) in enumerate(REGIONS):
         x = 8 + i * (rw + 2)
         d.rectangle([x, y, x + rw, y + 22], fill=col)
-        d.text((x + rw / 2, y + 11), f"{name} · {n}", font=SANS_B(9),
+        d.text((x + rw / 2, y + 11), f"{name} · {n}", font=SANS_B(7),
                fill=(255, 255, 255), anchor="mm")
     y += 22
     # --- UTC strip (header row + timeline row)
     d.text((8, y + 1), "THE DAY IN UTC", font=SANS_B(10), fill=NAVY, anchor="la")
     d.line([(8, y + 24), (W - 8, y + 24)], fill=CREAM_LINE, width=1)
-    ew = (W - 16) / 6
+    ew = (W - 16) / 7
     for i, (t, ev) in enumerate(UTC_EVENTS):
         cx = 8 + ew * i + ew / 2
         d.ellipse([cx - 3, y + 21, cx + 3, y + 27], fill=RED)
@@ -776,10 +844,10 @@ def build():
             ty += 11
         d.text((x + 6, hy + 198 - 9), h["src"], font=SANS(7), fill=GREY, anchor="la")
     y = hy + 198 + 4
-    # --- scenes grid 5x2
-    sw, sh = 196, 108
+    # --- scenes grid 6x2 (v3: 11 scenes)
+    sw, sh = 162, 108
     for idx, s in enumerate(SCENES):
-        r, c = divmod(idx, 5)
+        r, c = divmod(idx, 6)
         x = 8 + c * (sw + 7)
         sy = y + r * (sh + 4)
         d.rectangle([x, sy, x + sw, sy + sh], fill=(255, 255, 255),
@@ -791,8 +859,8 @@ def build():
         ty = sy + 67
         d.text((x + 4, ty), s["date"], font=SANS_B(7), fill=GREY, anchor="la")
         ty += 9
-        for ln in wrap(d, s["head"], SERIF_B(10), sw - 8)[:1]:
-            d.text((x + 4, ty), ln, font=SERIF_B(10), fill=INK, anchor="la")
+        for ln in wrap(d, s["head"], SERIF_B(9), sw - 8)[:1]:
+            d.text((x + 4, ty), ln, font=SERIF_B(9), fill=INK, anchor="la")
             ty += 11
         for ln in wrap(d, s["sub"], SANS(8), sw - 8)[:2]:
             d.text((x + 4, ty), ln, font=SANS(8), fill=(50, 50, 50), anchor="la")
@@ -805,34 +873,37 @@ def build():
     draw_map(d, (8, y, W - 8, y + 88))
     y += 88 + 4
     # --- ALSO list
-    d.text((8, y), "ALSO ON 26 NOVEMBER — 24 MORE STORIES",
+    d.text((8, y), "ALSO ON 26 NOVEMBER — 30 MORE STORIES",
            font=SANS_B(12), fill=NAVY, anchor="la")
-    d.text((W - 8, y), "17 pictured above + 24 below = 41 stories",
+    d.text((W - 8, y), "18 pictured above + 30 below = 48 stories",
            font=SANS_I(9), fill=GREY, anchor="ra")
     y += 15
-    colw = (W - 16 - 2 * 10) / 3
+    colw = (W - 16 - 3 * 10) / 4
     for i, (n, code, text) in enumerate(ALSO):
         col, row = divmod(i, 8)
         x = 8 + col * (colw + 10)
-        ry = y + row * 22
-        d.text((x, ry), str(n), font=SANS_B(10), fill=RED, anchor="la")
-        mw = minichip(d, x + 20, ry + 1, code)
-        tx = x + 20 + mw + 4
-        lines = wrap(d, text, SANS(10), colw - (tx - x) - 2)[:2]
+        ry = y + row * 20
+        d.text((x, ry), str(n), font=SANS_B(9), fill=RED, anchor="la")
+        mw = minichip(d, x + 18, ry + 1, code)
+        tx = x + 18 + mw + 4
+        lines = wrap(d, text, SANS(8), colw - (tx - x) - 2)[:2]
         for j, ln in enumerate(lines):
-            d.text((tx, ry + j * 11), ln, font=SANS(10), fill=INK, anchor="la")
-    y += 8 * 22 + 2
+            d.text((tx, ry + j * 9.5), ln, font=SANS(8), fill=INK, anchor="la")
+    y += 8 * 20 + 2
     # --- date check
     d.rectangle([8, y, W - 8, y + 58], outline=RED, width=2)
     d.text((14, y + 5), "DATE CHECK — NOT 26 NOVEMBER NEWS (EXCLUDED):",
            font=SANS_B(10), fill=RED, anchor="la")
     for i, item in enumerate(DATECHECK):
         col, row = divmod(i, 5)
-        x = 14 + col * ((W - 28) / 2)
+        x = 14 + col * ((W - 28) / 3)
         d.text((x, y + 19 + row * 7), "• " + item, font=SANS(8), fill=INK, anchor="la")
     y += 58 + 3
     # --- footer
     d.text((8, y), "HOW SURE:  OFFICIAL = authority's own word  ·  CONFIRMED = 2+ outlets  ·  REPORTED = 1 outlet  ·  CLAIM = one side's account, not verified  (ALSO list: OF/CF/RP/CL = same scale)",
+           font=SANS(8), fill=GREY, anchor="la")
+    y += 10
+    d.text((8, y), "Sources: AP · Reuters · BBC · AFP · CNN · The Guardian · USA Today · Euronews · Al Jazeera · SCMP · Yonhap · KCNA · UN News · ABC · AAP · TBS News · The Hindu · OkayAfrica · FlightAware · BusinessWorld",
            font=SANS(8), fill=GREY, anchor="la")
     y += 10
     d.text((8, y), "Every story happened or was first reported on Thursday 26 November 2026. Drawn scenes are illustrations, not photos.",
